@@ -30,6 +30,7 @@ const uglify = require('rollup-plugin-uglify')
 const minify = require('uglify-js').minify
 const vue = require('rollup-plugin-vue')
 const nodeGlobals = require('rollup-plugin-node-globals')
+const json = require('rollup-plugin-json')
 
 function onError(error) {
   gutils.log(error.message);
@@ -85,6 +86,7 @@ gulp.task('styles', function () {
 
 gulp.task('scripts', function () {
   var plugins = [
+    json({}),
     vue({
       css: function (styles, styleNodes) {
         fs.writeFileSync('./source/styles/modules/components.styl', styles)

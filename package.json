@@ -1,0 +1,50 @@
+{
+  "name": "comics",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ted-Mohamed/comics.git"
+  },
+  "author": "Mohamed Ted Meftah <contact@mohamed-ted.me> (http://mohamed-ted.me)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ted-Mohamed/comics/issues"
+  },
+  "homepage": "https://github.com/Ted-Mohamed/comics#readme",
+  "devDependencies": {
+    "autoprefixer": "^6.7.7",
+    "css-mqpacker": "^5.0.1",
+    "cssnano": "^3.10.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-connect": "^5.0.0",
+    "gulp-postcss": "^6.4.0",
+    "gulp-pug": "^3.3.0",
+    "gulp-sourcemaps": "^2.5.0",
+    "gulp-stylus": "^2.6.0",
+    "gulp-util": "^3.0.8",
+    "lodash.debounce": "^4.0.8",
+    "rollup": "^0.41.6",
+    "rollup-plugin-buble": "^0.15.0",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-globals": "^1.1.0",
+    "rollup-plugin-node-resolve": "^2.1.0",
+    "rollup-plugin-uglify": "^1.0.1",
+    "rollup-plugin-vue": "^2.3.1",
+    "rucksack-css": "^0.9.1",
+    "rupture": "^0.6.2",
+    "stylus-symetra": "^1.0.0",
+    "stylus-units": "^1.1.1",
+    "stylus-vertical-grid": "^1.2.0",
+    "syncy": "^2.2.2",
+    "uglify-js": "^2.8.20"
+  },
+  "dependencies": {
+    "vue": "^2.2.6"
+  }
+}

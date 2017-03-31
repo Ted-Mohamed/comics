@@ -31,7 +31,7 @@ const minify = require('uglify-js').minify
 const vue = require('rollup-plugin-vue')
 const nodeGlobals = require('rollup-plugin-node-globals')
 const json = require('rollup-plugin-json')
-
+const replace = require('rollup-plugin-replace')
 function onError(error) {
   gutils.log(error.message);
   this.emit('end');
@@ -70,7 +70,7 @@ gulp.task('styles', function () {
       cssnano(),
     ])
   }
-  
+
   return gulp.src('./source/styles/*.styl')
     .pipe(sourcemaps.init())
     .pipe(stylus({
@@ -103,6 +103,9 @@ gulp.task('scripts', function () {
   if (isProduction) {
     plugins = plugins.concat([
       uglify({}, minify),
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production')
+      })
     ])
   }
 
@@ -150,7 +153,7 @@ gulp.task('images', function () {
   }).catch(console.error)
 })
 
-gulp.task('clean', function(){
+gulp.task('clean', function () {
   del([
     './public/**/*.map',
   ])

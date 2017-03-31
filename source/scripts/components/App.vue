@@ -1,9 +1,12 @@
 <template>
     <div>
-        <img :src="false"
+    
+        <img :src="null"
              class="previous">
-        <img :src="false"
-             class="current">
+        <v-touch v-on:swipeleft="onSwipeLeft" v-on:swiperight="onSwipeRight">
+            <img :src="`./assets/comics/${currentURL}`"
+                 class="current">
+        </v-touch>
         <img :src="false"
              class="next">
     </div>
@@ -11,6 +14,26 @@
 
 <script>
 export default {
-    name: "App"
+    name: "App",
+    computed: {
+        currentURL() {
+            return this.$store.getters.currentURL
+        }
+    },
+    methods: {
+        onSwipeLeft() {
+            this.$store.dispatch('nextPage')
+        },
+        onSwipeRight() {
+             this.$store.dispatch('previousPage')
+        }
+    }
 }
 </script>
+
+<style>
+    img {
+       pointer-events: none;
+       width: 100%;
+    }
+</style>

@@ -36,6 +36,7 @@
     "rollup-plugin-json": "^2.1.0",
     "rollup-plugin-node-globals": "^1.1.0",
     "rollup-plugin-node-resolve": "^2.1.0",
+    "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-uglify": "^1.0.1",
     "rollup-plugin-vue": "^2.3.1",
     "rucksack-css": "^0.9.1",
@@ -47,6 +48,9 @@
     "uglify-js": "^2.8.20"
   },
   "dependencies": {
-    "vue": "^2.2.6"
+    "vue": "^2.2.6",
+    "vue-router": "^2.3.1",
+    "vuex": "^2.2.1",
+    "vuex-router-sync": "^2.1.1"
   }
 }

@@ -14,4 +14,4 @@ const manifest = glob.sync('./comics/*/*/*.{jpg,png}').reduce((accumulator, path
     return accumulator
 }, [])
 
-fs.writeFileSync('./source/scripts/manifest.json', JSON.stringify(manifest))
+fs.writeFileSync('./source/scripts/manifest.json', JSON.stringify(manifest, null, '  '))

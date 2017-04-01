@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueRouter from 'vue-router'
+
 Vue.use(Vuex)
+Vue.use(VueRouter)
 
 import manifest from './manifest.json'
 
@@ -18,12 +21,18 @@ function firsNotNullIndex(array) {
     return index
 }
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
     state: start(),
     getters: {
         currentURL(state) {
             return manifest[state.currentVolume][state.currentChapter][state.currentPage]
         },
+        previousURL(state) {
+            return manifest[state.currentVolume][state.currentChapter][state.currentPage - 1]
+        },
+        nextURL(state) {
+            return manifest[state.currentVolume][state.currentChapter][state.currentPage + 1]
+        }
     },
     mutations: {
         nextPage(state) {
@@ -36,6 +45,7 @@ export default new Vuex.Store({
                 state.currentVolume += 1
                 state.currentChapter = firsNotNullIndex(manifest[state.currentVolume])
                 state.currentPage = firsNotNullIndex(manifest[state.currentVolume][state.currentChapter])
+
             }
         },
         previousPage(state) {
@@ -56,3 +66,32 @@ export default new Vuex.Store({
         previousPage: ({ commit }) => commit('previousPage'),
     }
 })
+
+// Page('/:volume/:chapter/:page', function(context, next) {
+//     console.log(context, next)
+// })
+// Page(function(context, next) {
+//     console.log(context)
+//     console.log(context.path.match(/\/d+\/d+\/d+/) == null)
+// //    Page(`#/${store.state.currentVolume}/${store.state.currentChapter}/${store.state.currentPage}`)
+// })
+// Page({
+//     hashbang: true
+// })
+const router = new VueRouter({
+    routes: [
+        {
+            path: '/',
+            redirect: `/${store.state.currentVolume}/${store.state.currentChapter}/${store.state.currentPage}`
+        },
+        {
+            path: '/:volume/:chapter/:page',
+            beforeEnter() {
+                // console.log(arguments)
+            }
+        }
+    ]
+})
+
+export { store }
+export { router }

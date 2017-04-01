@@ -1,39 +1,88 @@
 <template>
-    <div>
-    
-        <img :src="null"
+    <div ref="container" class="container">
+        <img ref="current"
+             :src="`./assets/comics/${currentURL}`"
+             class="current">
+        <img v-show="panDirection == 'left'" ref="previous"
+             :src="previousURL ? `./assets/comics/${previousURL}` : './assets/comics/1/05/09.jpg'"
              class="previous">
-        <v-touch v-on:swipeleft="onSwipeLeft" v-on:swiperight="onSwipeRight">
-            <img :src="`./assets/comics/${currentURL}`"
-                 class="current">
-        </v-touch>
-        <img :src="false"
+        <img v-show="panDirection == 'right'" ref="next"
+             :src="`./assets/comics/${nextURL}`"
              class="next">
     </div>
 </template>
 
 <script>
+
+import Hammer from 'hammerjs'
 export default {
     name: "App",
     computed: {
         currentURL() {
             return this.$store.getters.currentURL
+        },
+        previousURL() {
+            return this.$store.getters.previousURL
+        },
+        nextURL() {
+            return this.$store.getters.nextURL
         }
     },
+
+    data: () => ({
+        panDirection: 'right'
+    }),
+
     methods: {
         onSwipeLeft() {
             this.$store.dispatch('nextPage')
         },
         onSwipeRight() {
-             this.$store.dispatch('previousPage')
+            this.$store.dispatch('previousPage')
         }
+    },
+    mounted() {
+        const hammer = new Hammer(this.$refs.container)
+        console.log(this.$refs.previous)
+        hammer.on('panend pancancel', (event) => {
+            this.$refs.current.style.transition = ' transform .25s ease-in-out'
+            this.$refs.previous.style.transition = ' transform .25s ease-in-out'
+            this.$refs.current.style.transform = 'translateX(0)';
+            this.$refs.previous.style.transform = 'translateX(0)';
+        });
+        hammer.on('panleft panright', (event) => {
+            if (event.deltaX > 0) {
+                this.panDirection = 'left'
+                this.$refs.previous.style.transform = `translateX(${event.deltaX}px)`;
+            } else {
+                this.panDirection = 'right'
+                this.$refs.current.style.transform = `translateX(${event.deltaX}px)`;
+            }
+        })
     }
 }
 </script>
 
 <style>
-    img {
-       pointer-events: none;
-       width: 100%;
-    }
+.container {
+    position: relative;
+}
+img {
+    pointer-events: none;
+    width: 100%;
+}
+img:not(.current) {
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+img.previous {
+    z-index: 2;
+    left: -100%
+}
+img.current {
+    transform: translateX(0);
+    position: relative;
+    z-index: 1
+}
 </style>

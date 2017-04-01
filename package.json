@@ -48,6 +48,8 @@
     "uglify-js": "^2.8.20"
   },
   "dependencies": {
+    "hammerjs": "^2.0.8",
+    "page": "^1.7.1",
     "vue": "^2.2.6",
     "vue-router": "^2.3.1",
     "vuex": "^2.2.1",

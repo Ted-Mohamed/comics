@@ -32,8 +32,57 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.container {
+    position: relative;
+}
 img {
-   pointer-events: none;
-   width: 100%;
+    pointer-events: none;
+    width: 100%;
+}
+img:not(.current) {
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+img.previous {
+    z-index: 2;
+    left: -100%
+}
+img.current {
+    transform: translateX(0);
+    position: relative;
+    z-index: 1
 }
 

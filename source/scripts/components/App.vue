@@ -4,7 +4,7 @@
              :src="`./assets/comics/${currentURL}`"
              class="current">
         <img v-show="panDirection == 'left'" ref="previous"
-             :src="previousURL ? `./assets/comics/${previousURL}` : './assets/comics/1/05/09.jpg'"
+             :src="`./assets/comics/${previousURL}`"
              class="previous">
         <img v-show="panDirection == 'right'" ref="next"
              :src="`./assets/comics/${nextURL}`"
@@ -43,12 +43,18 @@ export default {
     },
     mounted() {
         const hammer = new Hammer(this.$refs.container)
-        console.log(this.$refs.previous)
         hammer.on('panend pancancel', (event) => {
-            this.$refs.current.style.transition = ' transform .25s ease-in-out'
-            this.$refs.previous.style.transition = ' transform .25s ease-in-out'
+            const deltaX = event.deltaX / window.innerWidth
             this.$refs.current.style.transform = 'translateX(0)';
             this.$refs.previous.style.transform = 'translateX(0)';
+            console.log(deltaX)
+            if(deltaX > .4) {
+                this.onSwipeRight()
+            }
+
+            if (deltaX < -.4) {
+                this.onSwipeLeft()
+            }
         });
         hammer.on('panleft panright', (event) => {
             if (event.deltaX > 0) {

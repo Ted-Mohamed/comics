@@ -121,6 +121,10 @@ img {
     width: 100%;
 }
 
+.page.previous,
+.page.current {
+    box-shadow: 5px 0 20px rgba(0,0,0, .5), 20px 0 100px rgba(0,0,0, .2)
+}
 .page.previous {
     left: -100%;
     z-index: 3

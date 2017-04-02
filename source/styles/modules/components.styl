@@ -78,29 +78,42 @@
 
 
 
+
+
+
+
+
+
+
 .container {
-    position: relative;
+    display: flex;
+    width: 100vw;
+    -webkit-backface-visibility: hidden;
+}
+
+.page {
+    width: 100%;
+    flex-shrink: 0;
+    position: absolute;
+    -webkit-backface-visibility: hidden;
 }
 
 img {
     pointer-events: none;
     width: 100%;
+    -webkit-backface-visibility: hidden;
 }
 
-img:not(.current) {
-    top: 0;
-    left: 0;
-    position: absolute;
+.page.previous {
+    left: -100%;
+    z-index: 3
 }
 
-img.previous {
-    z-index: 2;
-    left: -100%
+.page.current {
+    z-index: 2
 }
 
-img.current {
-    transform: translateX(0);
-    position: relative;
+.page.next {
     z-index: 1
 }
 

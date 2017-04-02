@@ -1,20 +1,22 @@
 <template>
     <div ref="container"
          class="container">
-        <img ref="current"
-             :src="`./assets/comics/${currentURL}`"
-             class="current">
-        <img ref="previous"
-             :src="previousURL ? `./assets/comics/${previousURL}`: './assets/comics/1/05/07.jpg'"
-             class="previous">
-        <img ref="next"
-             :src="`./assets/comics/${nextURL}`"
-             class="next">
+        <div ref="previous"
+             class="page previous">
+            <img :src="previousURL ? `./assets/comics/${previousURL}`: './assets/comics/1/05/07.jpg'">
+        </div>
+        <div ref="current"
+             class="page current">
+            <img :src="`./assets/comics/${currentURL}`">
+        </div>
+        <div ref="next"
+             class="page next">
+            <img :src="`./assets/comics/${nextURL}`">
+        </div>
     </div>
 </template>
 
 <script>
-
 import Hammer from 'hammerjs'
 export default {
     name: "App",
@@ -31,7 +33,7 @@ export default {
     },
 
     data: () => ({
-        panDirection: 'right'
+
     }),
 
     methods: {
@@ -42,65 +44,76 @@ export default {
             this.$store.dispatch('previousPage')
         }
     },
+
     mounted() {
-        const hammer = new Hammer(this.$refs.container)
-        hammer.on('panend pancancel', (event) => {
-            const direction = event.deltaX > 0 ? 'right' : 'left'
-            const translation = Math.abs(event.deltaX / window.innerWidth) > .4 ? '100%' : '0'
+        const HM = new Hammer.Manager(this.$refs.container, { touchAction: 'auto' })
 
+        HM.add(new Hammer.Pan({
+            direction: Hammer.DIRECTION_HORIZONTAL
+        }));
+
+        HM.on('panleft panright', (e) => {
             window.requestAnimationFrame(() => {
-                if (event.deltaX > 0) {
-                    console.log("->", translation)
-                    this.$refs.previous.style.transform = `translateX(${translation})`;
-                    this.$refs.current.style.transform = `translateX(0)`;
-                    this.onSwipeRight()
-                } else {
-                    console.log("<-", translation)
-                    this.$refs.current.style.transform = `translateX(${translation})`;
-                    this.$refs.previous.style.transform = `translateX(0)`;
-                    this.onSwipeLeft()
-                }
-
+                this.$refs.previous.style.transform = `translateX(${e.deltaX > 0 ? e.deltaX : 0}px)`
+                this.$refs.current.style.transform = `translateX(${e.deltaX > 0 ? 0 : e.deltaX}px)`
             })
-
-        });
-        hammer.on('panleft panright', (event) => {
-            window.requestAnimationFrame(() => {
-                if (event.deltaX > 0) {
-                    this.$refs.previous.style.transform = `translateX(${event.deltaX}px)`;
-                } else {
-                    this.$refs.current.style.transform = `translateX(${event.deltaX}px)`;
-                }
-            });
         })
+
+        HM.on('pancancel panend', (e) => {
+
+            if (Math.abs(e.deltaX / window.innerWidth) > .4) {
+                window.requestAnimationFrame(() => {
+                    this.$refs.previous.style.transform = `translateX(${e.deltaX > 0 ? 100 : 0}%)`
+                    this.$refs.current.style.transform = `translateX(${e.deltaX > 0 ? 0 : 100}%)`
+                    this[`onSwipe${e.deltaX > 0 ? 'Right' : 'Left'}`]()
+                    this.$nextTick(() => {
+                        this.$refs.previous.style.transform = `translateX(0)`
+                        this.$refs.current.style.transform = `translateX(0)`
+                    })
+                })
+            } else {
+                window.requestAnimationFrame(() => {
+                    this.$refs.previous.style.transform = `translateX(0)`
+                    this.$refs.current.style.transform = `translateX(0)`
+                })
+            }
+        })
+
+        // HM.enable = false
     }
 }
 </script>
 
 <style>
 .container {
-    position: relative;
+    display: flex;
+    width: 100vw;
+    -webkit-backface-visibility: hidden;
+}
+
+.page {
+    width: 100%;
+    flex-shrink: 0;
+    position: absolute;
+    -webkit-backface-visibility: hidden;
 }
 
 img {
     pointer-events: none;
     width: 100%;
+    -webkit-backface-visibility: hidden;
 }
 
-img:not(.current) {
-    top: 0;
-    left: 0;
-    position: absolute;
+.page.previous {
+    left: -100%;
+    z-index: 3
 }
 
-img.previous {
-    z-index: 2;
-    left: -100%
+.page.current {
+    z-index: 2
 }
 
-img.current {
-    transform: translateX(0);
-    position: relative;
+.page.next {
     z-index: 1
 }
 </style>

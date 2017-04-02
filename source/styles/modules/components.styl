@@ -51,8 +51,18 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 .container {
-    display: flex;
     width: 100vw;
     backface-visibility: hidden;
 }
@@ -63,8 +73,6 @@
 
 .page {
     width: 100%;
-    flex-shrink: 0;
-    position: absolute;
     backface-visibility: hidden;
     will-change: transform;
 }
@@ -75,16 +83,12 @@ img {
     width: 100%;
 }
 
-.page.previous {
-    left: -100%;
-    z-index: 3
+.message {
+    background: #000;
+    width: 100%;
+    font-size: 30px;
+    color: #fff;
+    padding: 20px;
 }
 
-.page.current {
-    z-index: 2
-}
-
-.page.next {
-    z-index: 1
-}
 

@@ -1,8 +1,10 @@
 <template>
     <div ref="container"
          class="container">
+        <div class="message">
+            {{lastMessage}}</div>
         <div ref="current"
-             class="page current">
+             class="page">
             <img :key="currentURL"
                  :src="currentURL">
         </div>
@@ -11,14 +13,18 @@
 
 <script>
 import Hammer from 'hammerjs'
+import Firebase from 'firebase'
+const firebaseApp = Firebase.initializeApp({
+    apiKey: "FIREBASE_API_KEY",
+    authDomain: "AUTH_DOMAIN",
+    databaseURL: "FIREBASE_DATABASE_URL",
+    projectId: "FIREBASE_PROJECT_ID",
+    storageBucket: "FIREBASE_STORAGE_BUCKET",
+    messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID"
+})
+const db = firebaseApp.database()
+const messages = db.ref('messages').limitToLast(1)
 
-function onetime(node, type, callback) {
-    node.addEventListener(type, function (e) {
-        e.target.removeEventListener(e.type, arguments.callee);
-        return callback(e);
-    });
-
-}
 export default {
     name: "App",
     computed: {
@@ -26,9 +32,8 @@ export default {
             return `./assets/comics/${this.$store.getters.currentURL}`
         }
     },
-
     data: () => ({
-
+        lastMessage: '...'
     }),
 
     methods: {
@@ -46,13 +51,18 @@ export default {
         HM.on('swipeleft swiperight', (e) => {
             this.onSwipe(e.type == 'swipeleft' ? 'left' : 'right')
         })
+
+        messages.on('value', snapshot => {
+            snapshot.forEach((m) => {
+                this.lastMessage = m.val()
+            })
+        })
     }
 }
 </script>
 
 <style>
 .container {
-    display: flex;
     width: 100vw;
     backface-visibility: hidden;
 }
@@ -63,8 +73,6 @@ export default {
 
 .page {
     width: 100%;
-    flex-shrink: 0;
-    position: absolute;
     backface-visibility: hidden;
     will-change: transform;
 }
@@ -75,16 +83,12 @@ img {
     width: 100%;
 }
 
-.page.previous {
-    left: -100%;
-    z-index: 3
+.message {
+    background: #000;
+    width: 100%;
+    font-size: 30px;
+    color: #fff;
+    padding: 20px;
 }
 
-.page.current {
-    z-index: 2
-}
-
-.page.next {
-    z-index: 1
-}
 </style>

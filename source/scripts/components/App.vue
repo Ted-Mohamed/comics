@@ -3,15 +3,24 @@
          class="container">
         <div ref="previous"
              class="page previous">
-            <img :src="previousURL">
+            <transition name="fade">
+                <img :key="previousURL"
+                     :src="previousURL">
+            </transition>
         </div>
         <div ref="current"
              class="page current">
-            <img :src="currentURL">
+            <transition name="fade">
+                <img :key="currentURL"
+                     :src="currentURL">
+            </transition>
         </div>
         <div ref="next"
              class="page next">
-            <img :src="nextURL">
+            <transition name="fade">
+                <img :key="previousURL"
+                     :src="nextURL">
+            </transition>
         </div>
     </div>
 </template>
@@ -97,6 +106,16 @@ export default {
 </script>
 
 <style>
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s ease;
+}
+
+.fade-enter, .fade-leave-to
+/* .component-fade-leave-active for <2.1.8 */ {
+  opacity: 0;
+}
+
 .container {
     display: flex;
     width: 100vw;
@@ -104,7 +123,7 @@ export default {
 }
 
 .animate {
-    transition: transform .25s;
+    transition: transform .25s cubic-bezier(0.25, 0, 1, 1);
 }
 
 .page {
@@ -123,8 +142,9 @@ img {
 
 .page.previous,
 .page.current {
-    box-shadow: 5px 0 20px rgba(0,0,0, .5), 20px 0 100px rgba(0,0,0, .2)
+    box-shadow: 5px 0 20px rgba(0, 0, 0, .5), 20px 0 100px rgba(0, 0, 0, .2)
 }
+
 .page.previous {
     left: -100%;
     z-index: 3

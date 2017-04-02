@@ -33,7 +33,6 @@ export default {
 
     methods: {
         onSwipe(direction) {
-            console.log(direction)
             this.$store.dispatch(direction == 'left' ? 'nextPage' : 'previousPage')
         }
     },

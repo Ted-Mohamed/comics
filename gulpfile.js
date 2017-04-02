@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const gulp = require('gulp')
 const env = require('gulp-env')
 const gutils = require('gulp-util')
@@ -8,7 +9,7 @@ const exec = require('child_process').exec;
 const syncy = require('syncy');
 const debounce = require('lodash.debounce');
 const del = require('del');
-
+const glob = require('glob')
 const pug = require('gulp-pug')
 
 const stylus = require('gulp-stylus')
@@ -87,50 +88,53 @@ gulp.task('styles', function () {
 })
 
 gulp.task('scripts', function () {
-  var plugins = [
-    json({}),
-    replace({
-      "FIREBASE_API_KEY": process.env.FIREBASE_API_KEY,
-      "AUTH_DOMAIN": process.env.AUTH_DOMAIN,
-      "FIREBASE_DATABASE_URL": process.env.FIREBASE_DATABASE_URL,
-      "FIREBASE_PROJECT_ID": process.env.FIREBASE_PROJECT_ID,
-      "FIREBASE_STORAGE_BUCKET": process.env.FIREBASE_STORAGE_BUCKET,
-      "FIREBASE_MESSAGING_SENDER_ID": process.env.FIREBASE_MESSAGING_SENDER_ID
-    }),
-    vue({
-      css: function (styles, styleNodes) {
-        fs.writeFileSync('./source/styles/modules/components.styl', styles)
-      }
-    }),
-    buble({
-      objectAssign: 'Object.assign'
-    }),
-    resolve({ jsnext: true, main: true, browser: true }),
-    commonjs(),
-    nodeGlobals(),
-  ]
 
-  if (isProduction) {
-    plugins = plugins.concat([
-      uglify({}, minify),
+  glob.sync('./source/scripts/*.js').forEach(filepath => {
+    const filename = path.basename(filepath, '.js')
+
+    var plugins = [
+      json({}),
       replace({
-        'process.env.NODE_ENV': JSON.stringify('production')
-      })
-    ])
-  }
+        "FIREBASE_API_KEY": process.env.FIREBASE_API_KEY,
+        "AUTH_DOMAIN": process.env.AUTH_DOMAIN,
+        "FIREBASE_DATABASE_URL": process.env.FIREBASE_DATABASE_URL,
+        "FIREBASE_PROJECT_ID": process.env.FIREBASE_PROJECT_ID,
+        "FIREBASE_STORAGE_BUCKET": process.env.FIREBASE_STORAGE_BUCKET,
+        "FIREBASE_MESSAGING_SENDER_ID": process.env.FIREBASE_MESSAGING_SENDER_ID
+      }),
+      vue({
+        css: function (styles, styleNodes) {
+          fs.writeFileSync(`./source/styles/modules/${filename}.styl`, styles)
+        }
+      }),
+      buble({
+        objectAssign: 'Object.assign'
+      }),
+      resolve({ jsnext: true, main: true, browser: true }),
+      commonjs(),
+      nodeGlobals(),
+    ]
 
-  return rollup({
-    entry: './source/scripts/main.js',
-    plugins: plugins
-  }).then((bundle) => {
-    return bundle.write({
-      format: 'iife',
-      useStrict: false,
-      sourceMap: !isProduction,
-      dest: './public/assets/scripts/main.js'
+    if (isProduction) {
+      plugins = plugins.concat([
+        uglify({}, minify),
+        replace({
+          'process.env.NODE_ENV': JSON.stringify('production')
+        })
+      ])
+    }
+
+    return rollup({
+      entry: filepath,
+      plugins: plugins
+    }).then((bundle) => {
+      return bundle.write({
+        format: 'iife',
+        useStrict: false,
+        sourceMap: !isProduction,
+        dest: `./public/assets/scripts/${filename}.js`
+      })
     })
-  }).then(() => {
-    gulp.src('./source/main.js').pipe(connect.reload());
   })
 });
 

@@ -82,7 +82,10 @@ export default {
         const HM = new Hammer.Manager(this.$refs.container)
 
         HM.add(new Hammer.Pan({
-            direction: Hammer.DIRECTION_HORIZONTAL
+            direction: Hammer.DIRECTION_HORIZONTAL,
+            enable: function () {
+                return screen[window.orientation == 90 ? 'height' : 'width'] == window.innerWidth;
+            }
         }));
 
         HM.on('panleft panright', (e) => {
@@ -99,8 +102,6 @@ export default {
                 this.reset()
             }
         })
-
-        // HM.enable = false
     }
 }
 </script>

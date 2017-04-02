@@ -123,3 +123,4 @@ $RECYCLE.BIN/
 comics
 manifest.json
 public
+.env.json

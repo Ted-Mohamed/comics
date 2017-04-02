@@ -1,5 +1,6 @@
 const fs = require('fs')
 const gulp = require('gulp')
+const env = require('gulp-env')
 const gutils = require('gulp-util')
 const connect = require('gulp-connect')
 const sourcemaps = require('gulp-sourcemaps')
@@ -37,8 +38,9 @@ function onError(error) {
   this.emit('end');
 }
 
-var isProduction = !!gutils.env.production
+env('.env.json');
 
+var isProduction = !!gutils.env.production
 
 gulp.task('serve', function () {
   connect.server({
@@ -87,6 +89,14 @@ gulp.task('styles', function () {
 gulp.task('scripts', function () {
   var plugins = [
     json({}),
+    replace({
+      "FIREBASE_API_KEY": process.env.FIREBASE_API_KEY,
+      "AUTH_DOMAIN": process.env.AUTH_DOMAIN,
+      "FIREBASE_DATABASE_URL": process.env.FIREBASE_DATABASE_URL,
+      "FIREBASE_PROJECT_ID": process.env.FIREBASE_PROJECT_ID,
+      "FIREBASE_STORAGE_BUCKET": process.env.FIREBASE_STORAGE_BUCKET,
+      "FIREBASE_MESSAGING_SENDER_ID": process.env.FIREBASE_MESSAGING_SENDER_ID
+    }),
     vue({
       css: function (styles, styleNodes) {
         fs.writeFileSync('./source/styles/modules/components.styl', styles)

@@ -85,23 +85,40 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 .container {
     display: flex;
     width: 100vw;
-    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.animate {
+    transition: transform .25s;
 }
 
 .page {
     width: 100%;
     flex-shrink: 0;
     position: absolute;
-    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
 }
 
 img {
+    backface-visibility: hidden;
     pointer-events: none;
     width: 100%;
-    -webkit-backface-visibility: hidden;
 }
 
 .page.previous {

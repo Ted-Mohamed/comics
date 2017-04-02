@@ -3,32 +3,40 @@
          class="container">
         <div ref="previous"
              class="page previous">
-            <img :src="previousURL ? `./assets/comics/${previousURL}`: './assets/comics/1/05/07.jpg'">
+            <img :src="previousURL">
         </div>
         <div ref="current"
              class="page current">
-            <img :src="`./assets/comics/${currentURL}`">
+            <img :src="currentURL">
         </div>
         <div ref="next"
              class="page next">
-            <img :src="`./assets/comics/${nextURL}`">
+            <img :src="nextURL">
         </div>
     </div>
 </template>
 
 <script>
 import Hammer from 'hammerjs'
+
+function onetime(node, type, callback) {
+    node.addEventListener(type, function (e) {
+        e.target.removeEventListener(e.type, arguments.callee);
+        return callback(e);
+    });
+
+}
 export default {
     name: "App",
     computed: {
         currentURL() {
-            return this.$store.getters.currentURL
+            return `./assets/comics/${this.$store.getters.currentURL}`
         },
         previousURL() {
-            return this.$store.getters.previousURL
+            return this.$store.getters.previousURL ? `./assets/comics/${this.$store.getters.previousURL}` : './assets/images/nomore.jpg'
         },
         nextURL() {
-            return this.$store.getters.nextURL
+            return this.$store.getters.nextURL ? `./assets/comics/${this.$store.getters.nextURL}` : './assets/images/nomore.jpg'
         }
     },
 
@@ -37,16 +45,32 @@ export default {
     }),
 
     methods: {
-        onSwipeLeft() {
-            this.$store.dispatch('nextPage')
-        },
-        onSwipeRight() {
-            this.$store.dispatch('previousPage')
-        }
-    },
+        onSwipe(direction) {
+            const [action, element, translation] = direction == 'left' ?
+                ['nextPage', this.$refs.current, 'translateX(-100%)']
+                : ['previousPage', this.$refs.previous, 'translateX(100%)']
 
+            window.requestAnimationFrame(() => {
+                element.classList.add('animate')
+                element.style.transform = translation
+
+                onetime(element, 'transitionend', () => {
+                    element.classList.remove('animate')
+                    this.$store.dispatch(action)
+                    this.$nextTick(this.reset)
+                })
+            })
+        },
+
+        reset() {
+            window.requestAnimationFrame(() => {
+                this.$refs.previous.style.transform = `translateX(0)`
+                this.$refs.current.style.transform = `translateX(0)`
+            })
+        },
+    },
     mounted() {
-        const HM = new Hammer.Manager(this.$refs.container, { touchAction: 'auto' })
+        const HM = new Hammer.Manager(this.$refs.container)
 
         HM.add(new Hammer.Pan({
             direction: Hammer.DIRECTION_HORIZONTAL
@@ -60,22 +84,10 @@ export default {
         })
 
         HM.on('pancancel panend', (e) => {
-
             if (Math.abs(e.deltaX / window.innerWidth) > .4) {
-                window.requestAnimationFrame(() => {
-                    this.$refs.previous.style.transform = `translateX(${e.deltaX > 0 ? 100 : 0}%)`
-                    this.$refs.current.style.transform = `translateX(${e.deltaX > 0 ? 0 : 100}%)`
-                    this[`onSwipe${e.deltaX > 0 ? 'Right' : 'Left'}`]()
-                    this.$nextTick(() => {
-                        this.$refs.previous.style.transform = `translateX(0)`
-                        this.$refs.current.style.transform = `translateX(0)`
-                    })
-                })
+                this.onSwipe(e.deltaX > 0 ? 'right' : 'left')
             } else {
-                window.requestAnimationFrame(() => {
-                    this.$refs.previous.style.transform = `translateX(0)`
-                    this.$refs.current.style.transform = `translateX(0)`
-                })
+                this.reset()
             }
         })
 
@@ -88,20 +100,25 @@ export default {
 .container {
     display: flex;
     width: 100vw;
-    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.animate {
+    transition: transform .25s;
 }
 
 .page {
     width: 100%;
     flex-shrink: 0;
     position: absolute;
-    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
 }
 
 img {
+    backface-visibility: hidden;
     pointer-events: none;
     width: 100%;
-    -webkit-backface-visibility: hidden;
 }
 
 .page.previous {

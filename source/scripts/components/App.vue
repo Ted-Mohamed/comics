@@ -1,26 +1,10 @@
 <template>
     <div ref="container"
          class="container">
-        <div ref="previous"
-             class="page previous">
-            <transition name="fade">
-                <img :key="previousURL"
-                     :src="previousURL">
-            </transition>
-        </div>
         <div ref="current"
              class="page current">
-            <transition name="fade">
-                <img :key="currentURL"
-                     :src="currentURL">
-            </transition>
-        </div>
-        <div ref="next"
-             class="page next">
-            <transition name="fade">
-                <img :key="previousURL"
-                     :src="nextURL">
-            </transition>
+            <img :key="currentURL"
+                 :src="currentURL">
         </div>
     </div>
 </template>
@@ -40,12 +24,6 @@ export default {
     computed: {
         currentURL() {
             return `./assets/comics/${this.$store.getters.currentURL}`
-        },
-        previousURL() {
-            return this.$store.getters.previousURL ? `./assets/comics/${this.$store.getters.previousURL}` : './assets/images/nomore.jpg'
-        },
-        nextURL() {
-            return this.$store.getters.nextURL ? `./assets/comics/${this.$store.getters.nextURL}` : './assets/images/nomore.jpg'
         }
     },
 
@@ -55,68 +33,25 @@ export default {
 
     methods: {
         onSwipe(direction) {
-            const [action, element, translation] = direction == 'left' ?
-                ['nextPage', this.$refs.current, 'translateX(-100%)']
-                : ['previousPage', this.$refs.previous, 'translateX(100%)']
-
-            window.requestAnimationFrame(() => {
-                element.classList.add('animate')
-                element.style.transform = translation
-
-                onetime(element, 'transitionend', () => {
-                    element.classList.remove('animate')
-                    this.$store.dispatch(action)
-                    this.$nextTick(this.reset)
-                })
-            })
-        },
-
-        reset() {
-            window.requestAnimationFrame(() => {
-                this.$refs.previous.style.transform = `translateX(0)`
-                this.$refs.current.style.transform = `translateX(0)`
-            })
-        },
+            console.log(direction)
+            this.$store.dispatch(direction == 'left' ? 'nextPage' : 'previousPage')
+        }
     },
     mounted() {
         const HM = new Hammer.Manager(this.$refs.container)
 
-        HM.add(new Hammer.Pan({
+        HM.add(new Hammer.Swipe({
             direction: Hammer.DIRECTION_HORIZONTAL,
-            enable: function () {
-                return screen[window.orientation == 90 ? 'height' : 'width'] == window.innerWidth;
-            }
         }));
 
-        HM.on('panleft panright', (e) => {
-            window.requestAnimationFrame(() => {
-                this.$refs.previous.style.transform = `translateX(${e.deltaX > 0 ? e.deltaX : 0}px)`
-                this.$refs.current.style.transform = `translateX(${e.deltaX > 0 ? 0 : e.deltaX}px)`
-            })
-        })
-
-        HM.on('pancancel panend', (e) => {
-            if (Math.abs(e.deltaX / window.innerWidth) > .4) {
-                this.onSwipe(e.deltaX > 0 ? 'right' : 'left')
-            } else {
-                this.reset()
-            }
+        HM.on('swipeleft swiperight', (e) => {
+            this.onSwipe(e.type == 'swipeleft' ? 'left' : 'right')
         })
     }
 }
 </script>
 
 <style>
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .3s ease;
-}
-
-.fade-enter, .fade-leave-to
-/* .component-fade-leave-active for <2.1.8 */ {
-  opacity: 0;
-}
-
 .container {
     display: flex;
     width: 100vw;
@@ -139,11 +74,6 @@ img {
     backface-visibility: hidden;
     pointer-events: none;
     width: 100%;
-}
-
-.page.previous,
-.page.current {
-    box-shadow: 5px 0 20px rgba(0, 0, 0, .5), 20px 0 100px rgba(0, 0, 0, .2)
 }
 
 .page.previous {

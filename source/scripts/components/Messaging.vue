@@ -1,7 +1,10 @@
 <template>
     <div ref="container"
          class="container">
-        <input class="message" type="text" v-model="message"  @keyup.enter="sendMessage">
+        <input class="message"
+               type="text"
+               v-model="message"
+               @keyup.enter="sendMessage">
         <div ref="current"
              class="page">
             <img :key="currentURL"
@@ -38,7 +41,7 @@ export default {
     methods: {
         onSwipe(direction) {
             this.$store.dispatch(direction == 'left' ? 'nextPage' : 'previousPage')
-        }, 
+        },
         sendMessage() {
             console.log("hi")
             messages.push(this.message)
@@ -87,6 +90,9 @@ img {
     font-size: 30px;
     color: #fff;
     padding: 20px;
+    position: sticky;
+    top: 0;
+    display: block;
+    z-index: 100;
 }
-
 </style>

@@ -89,6 +89,10 @@ img {
     font-size: 30px;
     color: #fff;
     padding: 20px;
+    position: sticky;
+    top: 0;
+    display: block;
+    z-index: 100;
 }
 
 </style>

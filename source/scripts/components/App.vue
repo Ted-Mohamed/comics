@@ -3,9 +3,9 @@
          class="container">
         <div class="message">
             {{lastMessage}}</div>
-        <div ref="current"
+        <div ref="page"
              class="page">
-            <img ref="image"
+            <img ref="image" class="animate"
                  :src="currentURL">
         </div>
     </div>
@@ -15,7 +15,7 @@
 import Hammer from 'hammerjs'
 import { database } from '../includes/firebase.js'
 const messages = database.ref('messages').limitToLast(1)
-
+import {clamp} from '../includes/utility.js'
 export default {
     name: "App",
     computed: {
@@ -59,7 +59,7 @@ export default {
         var currentDeltaY = null;
 
         HM.on("pinch pan", (e) => {
-            currentScale = adjustScale * 2;
+            currentScale = adjustScale * e.scale;
             currentDeltaX = adjustDeltaX + (e.deltaX / currentScale);
             currentDeltaY = adjustDeltaY + (e.deltaY / currentScale);
             this.$refs.image.style.transform = `scale(${currentScale}) translate(${currentDeltaX}px,${currentDeltaY}px)`
@@ -68,17 +68,10 @@ export default {
 
         HM.on("panend pinchend", (e) => {
             const imgDimen = this.$refs.image.getBoundingClientRect();
-            console.log(imgDimen.top + imgDimen.height, window.innerHeight)
-            console.log(currentScale, currentDeltaX, currentDeltaY)
-            if (currentScale > 1) {
-                adjustScale = currentScale;
-                adjustDeltaX = currentDeltaX;
-                adjustDeltaY = currentDeltaY;
-            } else {
-                adjustScale = 1;
-                adjustDeltaX = 0;
-                adjustDeltaY = 0;
-            }
+            const pageDimen = this.$refs.page.getBoundingClientRect();
+            adjustScale = clamp(currentScale, 1, 3)
+            adjustDeltaX = clamp(currentDeltaX, (pageDimen.width - imgDimen.width) / adjustScale, 0)
+            adjustDeltaY = clamp(currentDeltaY, (pageDimen.height - imgDimen.height) / adjustScale, 0)
             this.$refs.image.style.transform = `scale(${adjustScale}) translate(${adjustDeltaX}px,${adjustDeltaY}px)`
         });
 
@@ -119,6 +112,7 @@ img {
     backface-visibility: hidden;
     pointer-events: none;
     width: 100%;
+    transform-origin: 0 0;
 }
 
 .message {

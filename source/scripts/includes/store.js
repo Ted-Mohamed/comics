@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-import manifest from './manifest.json'
+import manifest from '../manifest.json'
 
 export default new Vuex.Store({
     state: {

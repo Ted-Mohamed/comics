@@ -24,16 +24,6 @@ const autoprefixer = require('autoprefixer')
 const cssnano = require('cssnano')
 const mqpacker = require("css-mqpacker")
 
-const rollup = require('rollup').rollup
-const buble = require('rollup-plugin-buble')
-const resolve = require('rollup-plugin-node-resolve')
-const commonjs = require('rollup-plugin-commonjs')
-const uglify = require('rollup-plugin-uglify')
-const minify = require('uglify-js').minify
-const vue = require('rollup-plugin-vue')
-const nodeGlobals = require('rollup-plugin-node-globals')
-const json = require('rollup-plugin-json')
-const replace = require('rollup-plugin-replace')
 function onError(error) {
   gutils.log(error.message);
   this.emit('end');
@@ -87,63 +77,90 @@ gulp.task('styles', function () {
     .pipe(connect.reload());
 })
 
+const webpackStream = require('webpack-stream');
+const named = require('vinyl-named');
+const webpack = require('webpack');
 gulp.task('scripts', function () {
-
-  glob.sync('./source/scripts/*.js').forEach(filepath => {
-    const filename = path.basename(filepath, '.js')
-
-    var plugins = [
-      json({}),
-      replace({
-        "FIREBASE_API_KEY": process.env.FIREBASE_API_KEY,
-        "AUTH_DOMAIN": process.env.AUTH_DOMAIN,
-        "FIREBASE_DATABASE_URL": process.env.FIREBASE_DATABASE_URL,
-        "FIREBASE_PROJECT_ID": process.env.FIREBASE_PROJECT_ID,
-        "FIREBASE_STORAGE_BUCKET": process.env.FIREBASE_STORAGE_BUCKET,
-        "FIREBASE_MESSAGING_SENDER_ID": process.env.FIREBASE_MESSAGING_SENDER_ID
-      }),
-      vue({
-        css: function (styles, styleNodes) {
-          fs.writeFileSync(`./source/styles/modules/${filename}.styl`, styles)
-        }
-      }),
-      buble({
-        objectAssign: 'Object.assign'
-      }),
-      resolve({ jsnext: true, main: true, browser: true }),
-      commonjs(),
-      nodeGlobals(),
-    ]
-
-    if (isProduction) {
-      plugins = plugins.concat([
-        uglify({}, minify),
-        replace({
-          'process.env.NODE_ENV': JSON.stringify('production')
-        })
-      ])
-    }
-
-    return rollup({
-      entry: filepath,
-      plugins: plugins
-    }).then((bundle) => {
-      return bundle.write({
-        format: 'iife',
-        useStrict: false,
-        sourceMap: !isProduction,
-        dest: `./public/assets/scripts/${filename}.js`
-      })
-    })
-  })
+  const ExtractTextPlugin = require("extract-text-webpack-plugin");
+  gulp.task('scripts', function () {
+    return gulp.src('source/scripts/*.js')
+      .pipe(named())
+      .pipe(webpackStream({
+        output: {
+          filename: '[name].js',
+        },
+        resolve: {
+          extensions: ['.js', '.vue', '.json'],
+          alias: {}
+        },
+        module: {
+          rules: [
+            {
+              test: /\.vue$/,
+              loader: 'vue-loader',
+              options: {
+                loaders: {
+                  js: 'buble-loader',
+                  stylus: ExtractTextPlugin.extract({
+                    use: 'raw-loader',
+                  })
+                }
+              }
+            },
+            {
+              test: /\.js$/,
+              loader: 'buble-loader',
+              exclude: /node_modules/
+            },
+          ]
+        },
+        plugins: [
+          // new webpack.LoaderOptionsPlugin({
+          //   minimize: true,
+          //   debug: false
+          // }),
+          new ExtractTextPlugin({
+            filename: (getPath) => {
+              return path.relative(path.resolve(__dirname, './public/assets/scripts/'), path.resolve(__dirname, './source/styles/components', getPath('[name].styl')))
+            },
+            allChunks: true
+          }),
+          new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor',
+          }),
+          new webpack.DefinePlugin({
+            // 'process.env.NODE_ENV': JSON.stringify('production'),
+            FIREBASE_API_KEY: JSON.stringify(process.env.FIREBASE_API_KEY),
+            AUTH_DOMAIN: JSON.stringify(process.env.AUTH_DOMAIN),
+            FIREBASE_DATABASE_URL: JSON.stringify(process.env.FIREBASE_DATABASE_URL),
+            FIREBASE_PROJECT_ID: JSON.stringify(process.env.FIREBASE_PROJECT_ID),
+            FIREBASE_STORAGE_BUCKET: JSON.stringify(process.env.FIREBASE_STORAGE_BUCKET),
+            FIREBASE_MESSAGING_SENDER_ID: JSON.stringify(process.env.FIREBASE_MESSAGING_SENDER_ID)
+          }),
+          // new webpack.optimize.UglifyJsPlugin({
+          //   beautify: false,
+          //   mangle: {
+          //     screw_ie8: true,
+          //     keep_fnames: true
+          //   },
+          //   compress: {
+          //     screw_ie8: true
+          //   },
+          //   comments: false
+          // })
+        ],
+      }, webpack))
+      .on('error', onError)
+      .pipe(gulp.dest('./public/assets/scripts/'));
+  });
 });
 
-gulp.task('watch', ['images', 'fonts', 'markup', 'styles', 'scripts'], function () {
+gulp.task('watch', ['images', 'fonts', 'markup',  'scripts', 'styles'], function () {
   gulp.watch("source/images/**/*", { cwd: './' }, ['images'])
   gulp.watch("source/fonts/**/*", { cwd: './' }, ['fonts'])
   gulp.watch("source/styles/**/*.styl", { cwd: './' }, ['styles']);
   gulp.watch("source/markup/**/*.pug", { cwd: './' }, ['markup']);
-  gulp.watch("source/**/*.{js,vue}", { cwd: './' }, ['scripts']);
+  gulp.watch("source/scripts/**/*.{js,vue}", { cwd: './' }, ['scripts']);
 });
 
 gulp.task("fonts", function () {

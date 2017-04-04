@@ -5,7 +5,7 @@
             {{lastMessage}}</div>
         <div ref="current"
              class="page">
-            <img :key="currentURL"
+            <img ref="image"
                  :src="currentURL">
         </div>
     </div>
@@ -15,12 +15,12 @@
 import Hammer from 'hammerjs'
 import Firebase from 'firebase'
 const firebaseApp = Firebase.initializeApp({
-    apiKey: "FIREBASE_API_KEY",
-    authDomain: "AUTH_DOMAIN",
-    databaseURL: "FIREBASE_DATABASE_URL",
-    projectId: "FIREBASE_PROJECT_ID",
-    storageBucket: "FIREBASE_STORAGE_BUCKET",
-    messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID"
+    apiKey: FIREBASE_API_KEY,
+    authDomain: AUTH_DOMAIN,
+    databaseURL: FIREBASE_DATABASE_URL,
+    projectId: FIREBASE_PROJECT_ID,
+    storageBucket: FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: FIREBASE_MESSAGING_SENDER_ID
 })
 const db = firebaseApp.database()
 const messages = db.ref('messages').limitToLast(1)
@@ -44,13 +44,56 @@ export default {
     mounted() {
         const HM = new Hammer.Manager(this.$refs.container)
 
-        HM.add(new Hammer.Swipe({
+
+        const swipe = new Hammer.Swipe({
             direction: Hammer.DIRECTION_HORIZONTAL,
-        }));
+        })
+        const pinch = new Hammer.Pinch()
+        const pan = new Hammer.Pan()
+
+        pinch.recognizeWith(pan);
+
+        HM.add([pinch, pan, swipe]);
 
         HM.on('swipeleft swiperight', (e) => {
             this.onSwipe(e.type == 'swipeleft' ? 'left' : 'right')
         })
+
+        var adjustScale = 1;
+        var adjustDeltaX = 0;
+        var adjustDeltaY = 0;
+
+        var currentScale = null;
+        var currentDeltaX = null;
+        var currentDeltaY = null;
+
+        HM.on("pinch pan", (e) => {
+            currentScale = adjustScale * 2;
+            currentDeltaX = adjustDeltaX + (e.deltaX / currentScale);
+            currentDeltaY = adjustDeltaY + (e.deltaY / currentScale);
+            this.$refs.image.style.transform = `scale(${currentScale}) translate(${currentDeltaX}px,${currentDeltaY}px)`
+        });
+
+
+        HM.on("panend pinchend", (e) => {
+            const imgDimen = this.$refs.image.getBoundingClientRect();
+            console.log(imgDimen.top + imgDimen.height, window.innerHeight)
+            console.log(currentScale, currentDeltaX, currentDeltaY)
+            if (currentScale > 1) {
+                adjustScale = currentScale;
+                adjustDeltaX = currentDeltaX;
+                adjustDeltaY = currentDeltaY;
+            } else {
+                adjustScale = 1;
+                adjustDeltaX = 0;
+                adjustDeltaY = 0;
+            }
+            this.$refs.image.style.transform = `scale(${adjustScale}) translate(${adjustDeltaX}px,${adjustDeltaY}px)`
+        });
+
+
+
+
 
         messages.on('value', snapshot => {
             snapshot.forEach((m) => {
@@ -61,10 +104,13 @@ export default {
 }
 </script>
 
-<style>
+<style lang="stylus">
 .container {
     width: 100vw;
     backface-visibility: hidden;
+    .c {
+        top: 50px
+    }
 }
 
 .animate {
@@ -78,6 +124,7 @@ export default {
 }
 
 img {
+    background: url('./assets/comics/2/09/01.jpg');
     backface-visibility: hidden;
     pointer-events: none;
     width: 100%;
@@ -94,5 +141,4 @@ img {
     display: block;
     z-index: 100;
 }
-
 </style>

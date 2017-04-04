@@ -17,12 +17,12 @@
 import Hammer from 'hammerjs'
 import Firebase from 'firebase'
 const firebaseApp = Firebase.initializeApp({
-    apiKey: "FIREBASE_API_KEY",
-    authDomain: "AUTH_DOMAIN",
-    databaseURL: "FIREBASE_DATABASE_URL",
-    projectId: "FIREBASE_PROJECT_ID",
-    storageBucket: "FIREBASE_STORAGE_BUCKET",
-    messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID"
+    apiKey: FIREBASE_API_KEY,
+    authDomain: AUTH_DOMAIN,
+    databaseURL: FIREBASE_DATABASE_URL,
+    projectId: FIREBASE_PROJECT_ID,
+    storageBucket: FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: FIREBASE_MESSAGING_SENDER_ID
 })
 const db = firebaseApp.database()
 const messages = db.ref('messages')
@@ -62,7 +62,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="stylus">
 .container {
     width: 100vw;
     backface-visibility: hidden;

@@ -1,11 +1,10 @@
 <template>
     <div class="ChatView">
-
-        <ul>
-            <li v-if="showLastOnly" class="message">{{lastMessage}}</li>
-            <li v-else class="message" v-for="message in messages">{{message}}</li>
+        <button class="historyToggle" @click="showHistory = !showHistory"></button>
+        <ul class="messages">
+            <li v-if="showHistory" class="message" v-for="message in messages">{{message}}</li>
+            <li class="message">{{lastMessage}}</li>
         </ul>
-
     </div>
 </template>
 
@@ -16,14 +15,11 @@ const messagesDB = database.ref('messages')
 export default {
     name: "ChatView",
 
-    computed: {
-        lastMessage() {
-            return this.messages[this.messages.length - 1] || "..."
-        }
-    },
+    computed: {},
 
     data: () => ({
-        showLastOnly: true,
+        showHistory: false,
+        lastMessage: '...',
         messages: [],
         message: ''
     }),
@@ -38,11 +34,12 @@ export default {
     },
 
     mounted() {
-        messagesDB.limitToLast(6).on('value', snapshot => {
+        messagesDB.limitToLast(20).on('value', snapshot => {
             let messages = []
             snapshot.forEach((message) => {
                 messages.push(message.val())
             })
+            this.lastMessage = messages.pop()
             this.messages = messages
         })
     }
@@ -50,15 +47,38 @@ export default {
 </script>
 
 <style lang="stylus">
-.message {
-    background: #000;
-    width: 100%;
-    font-size: 30px;
-    color: #fff;
-    padding: 20px;
-    position: sticky;
-    top: 0;
-    display: block;
-    z-index: 100;
+.ChatView {
+    position: relative;
+    height: 2.5rem;
+    
+    .historyToggle {
+        position: absolute;
+        z-index: 150;
+        background: red;
+        width: 1rem;
+        height: 1rem;
+        top: .75rem;
+        right: .75rem
+    }
+
+    .messages {
+        position: absolute;
+        z-index: 100;
+        width: 100%;
+        max-height: 50vh;
+        overflow: scroll;
+    }
+    .message {
+        background: #000;
+        width: 100%;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #fff;
+        padding: .5rem;
+        position: sticky;
+        top: 0;
+        display: block;
+        z-index: 100;
+    }
 }
 </style>

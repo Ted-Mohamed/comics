@@ -1,3 +1,17 @@
 @import './common/normalize.styl'
+
+.scrollable {
+    -webkit-overflow-scrolling: touch;
+}
+
+$highlight-color := rgba(56, 116, 251, 1.00);
+$backgeound-color :=  rgba(38, 38, 42, 1.00);
+$text-color := rgba(255, 255, 255, .8);
+
+html, body {
+    height: 100%;
+    background-color: $backgeound-color;
+}
+
 @import './components/main.styl'
 

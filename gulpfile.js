@@ -127,6 +127,9 @@ gulp.task('scripts', function () {
           }),
           new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
+            minChunks: function (module) {
+              return module.context && module.context.indexOf('node_modules') !== -1;
+            }
           }),
           new webpack.DefinePlugin({
             // 'process.env.NODE_ENV': JSON.stringify('production'),
@@ -155,7 +158,7 @@ gulp.task('scripts', function () {
   });
 });
 
-gulp.task('watch', ['images', 'fonts', 'markup',  'scripts', 'styles'], function () {
+gulp.task('watch', ['images', 'fonts', 'markup', 'scripts', 'styles'], function () {
   gulp.watch("source/images/**/*", { cwd: './' }, ['images'])
   gulp.watch("source/fonts/**/*", { cwd: './' }, ['fonts'])
   gulp.watch("source/styles/**/*.styl", { cwd: './' }, ['styles']);

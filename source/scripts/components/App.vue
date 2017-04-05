@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <ChatView></ChatView>
+        <ChatView showInput></ChatView>
         <ZoomableImage @swipe="onSwipe"
                        :src="currentURL"></ZoomableImage>
     </div>
@@ -29,9 +29,6 @@ export default {
 </script>
 
 <style lang="stylus">
-html, body {
-    height: 100%;
-}
 .container {
     width: 100vw;
     height: calc(100% - 0px);

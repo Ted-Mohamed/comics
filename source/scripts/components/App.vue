@@ -1,8 +1,6 @@
 <template>
-    <div ref="container"
-         class="container">
-        <div class="message">
-            {{lastMessage}}</div>
+    <div class="container">
+        <ChatView></ChatView>
         <ZoomableImage @swipe="onSwipe"
                        :src="currentURL"></ZoomableImage>
     </div>
@@ -10,34 +8,23 @@
 
 <script>
 import ZoomableImage from './ZoomableImage.vue'
-import { database } from '../includes/firebase.js'
-const messages = database.ref('messages').limitToLast(1)
+import ChatView from './ChatView.vue'
 export default {
     name: "App",
-    components: {
-        ZoomableImage
-    },
+
+    components: { ZoomableImage, ChatView },
+
     computed: {
         currentURL() {
             return `./assets/comics/${this.$store.getters.currentURL}`
         }
     },
-    data: () => ({
-        lastMessage: '...'
-    }),
 
     methods: {
         onSwipe(direction) {
             this.$store.dispatch(direction == 'left' ? 'nextPage' : 'previousPage')
         }
     },
-    mounted() {
-        messages.on('value', snapshot => {
-            snapshot.forEach((m) => {
-                this.lastMessage = m.val()
-            })
-        })
-    }
 }
 </script>
 
@@ -54,18 +41,5 @@ html, body {
 
 .ZoomableImage {
     flex: 1;
-}
-
-.message {
-    background: #000;
-    width: 100%;
-    font-size: 30px;
-    color: #fff;
-    padding: 20px;
-    position: sticky;
-    top: 0;
-    display: block;
-    position: relative;
-    z-index: 100;
 }
 </style>

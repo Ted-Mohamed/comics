@@ -11,18 +11,6 @@ html, body {
 .ZoomableImage {
     flex: 1;
 }
-.message {
-    background: #000;
-    width: 100%;
-    font-size: 30px;
-    color: #fff;
-    padding: 20px;
-    position: sticky;
-    top: 0;
-    display: block;
-    position: relative;
-    z-index: 100;
-}
 
 ZoomableImage .animate {
     transition: transform .1s ease-in-out;
@@ -40,4 +28,16 @@ ZoomableImage .animate {
     transform-origin: 0 0;
     will-change: transform;
     z-index: 5
+}
+
+.message {
+    background: #000;
+    width: 100%;
+    font-size: 30px;
+    color: #fff;
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    display: block;
+    z-index: 100;
 }

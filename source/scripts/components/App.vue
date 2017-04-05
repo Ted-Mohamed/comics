@@ -37,6 +37,12 @@ export default {
         }
     },
 
+    watch: {
+        id: function (newVal) {
+            this.$store.dispatch('goToPage', newVal)
+        }
+    },
+
     mounted () {
         this.$store.dispatch('goToPage', this.id)
     }

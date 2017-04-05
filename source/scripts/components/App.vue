@@ -3,21 +3,20 @@
          class="container">
         <div class="message">
             {{lastMessage}}</div>
-        <div ref="page"
-             class="page">
-            <img ref="image" class="animate"
-                 :src="currentURL">
-        </div>
+        <ZoomableImage @swipe="onSwipe"
+                       :src="currentURL"></ZoomableImage>
     </div>
 </template>
 
 <script>
-import Hammer from 'hammerjs'
+import ZoomableImage from './ZoomableImage.vue'
 import { database } from '../includes/firebase.js'
 const messages = database.ref('messages').limitToLast(1)
-import {clamp} from '../includes/utility.js'
 export default {
     name: "App",
+    components: {
+        ZoomableImage
+    },
     computed: {
         currentURL() {
             return `./assets/comics/${this.$store.getters.currentURL}`
@@ -33,52 +32,6 @@ export default {
         }
     },
     mounted() {
-        const HM = new Hammer.Manager(this.$refs.container)
-
-
-        const swipe = new Hammer.Swipe({
-            direction: Hammer.DIRECTION_HORIZONTAL,
-        })
-        const pinch = new Hammer.Pinch()
-        const pan = new Hammer.Pan()
-
-        pinch.recognizeWith(pan);
-
-        HM.add([pinch, pan, swipe]);
-
-        HM.on('swipeleft swiperight', (e) => {
-            this.onSwipe(e.type == 'swipeleft' ? 'left' : 'right')
-        })
-
-        var adjustScale = 1;
-        var adjustDeltaX = 0;
-        var adjustDeltaY = 0;
-
-        var currentScale = null;
-        var currentDeltaX = null;
-        var currentDeltaY = null;
-
-        HM.on("pinch pan", (e) => {
-            currentScale = adjustScale * e.scale;
-            currentDeltaX = adjustDeltaX + (e.deltaX / currentScale);
-            currentDeltaY = adjustDeltaY + (e.deltaY / currentScale);
-            this.$refs.image.style.transform = `scale(${currentScale}) translate(${currentDeltaX}px,${currentDeltaY}px)`
-        });
-
-
-        HM.on("panend pinchend", (e) => {
-            const imgDimen = this.$refs.image.getBoundingClientRect();
-            const pageDimen = this.$refs.page.getBoundingClientRect();
-            adjustScale = clamp(currentScale, 1, 3)
-            adjustDeltaX = clamp(currentDeltaX, (pageDimen.width - imgDimen.width) / adjustScale, 0)
-            adjustDeltaY = clamp(currentDeltaY, (pageDimen.height - imgDimen.height) / adjustScale, 0)
-            this.$refs.image.style.transform = `scale(${adjustScale}) translate(${adjustDeltaX}px,${adjustDeltaY}px)`
-        });
-
-
-
-
-
         messages.on('value', snapshot => {
             snapshot.forEach((m) => {
                 this.lastMessage = m.val()
@@ -89,30 +42,18 @@ export default {
 </script>
 
 <style lang="stylus">
+html, body {
+    height: 100%;
+}
 .container {
     width: 100vw;
-    backface-visibility: hidden;
-    .c {
-        top: 50px
-    }
+    height: calc(100% - 0px);
+    display: flex;
+    flex-direction: column
 }
 
-.animate {
-    transition: transform .25s cubic-bezier(0.25, 0, 1, 1);
-}
-
-.page {
-    width: 100%;
-    backface-visibility: hidden;
-    will-change: transform;
-}
-
-img {
-    background: url('./assets/comics/2/09/01.jpg');
-    backface-visibility: hidden;
-    pointer-events: none;
-    width: 100%;
-    transform-origin: 0 0;
+.ZoomableImage {
+    flex: 1;
 }
 
 .message {
@@ -124,6 +65,7 @@ img {
     position: sticky;
     top: 0;
     display: block;
+    position: relative;
     z-index: 100;
 }
 </style>

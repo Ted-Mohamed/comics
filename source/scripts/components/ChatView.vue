@@ -1,6 +1,7 @@
 <template>
     <div class="ChatView">
-        <input v-if="showInput" class="message"
+        <input v-if="showInput"
+               class="message"
                type="text"
                v-model="message"
                @keyup.enter="sendMessage">
@@ -23,16 +24,18 @@ const messagesDB = database.ref('messages')
 
 export default {
     name: "ChatView",
-
-    computed: {},
-    props: ['showInput'],
+    props: {
+        showInput: {
+            type: Boolean,
+            default: false
+        }
+    },
     data: () => ({
         showHistory: false,
         lastMessage: '...',
         messages: [],
         message: ''
     }),
-
     methods: {
         sendMessage() {
             if (this.message !== '') {

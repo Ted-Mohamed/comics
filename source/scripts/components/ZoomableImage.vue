@@ -1,5 +1,6 @@
 <template>
-    <div class="ZoomableImage" ref="container">
+    <div class="ZoomableImage"
+         ref="container">
         <img ref="image"
              :src="src">
     </div>
@@ -23,7 +24,7 @@ export default {
         const pinch = new Hammer.Pinch()
         const pan = new Hammer.Pan({
             enable: function (rec, input) {
-                return adjustScale !== 1 || (input && input.offsetDirection&Hammer.DIRECTION_VERTICAL)
+                return adjustScale !== 1 || (input && input.offsetDirection & Hammer.DIRECTION_VERTICAL)
             }
         })
 

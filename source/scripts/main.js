@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import store from './includes/store'
 
-import App from './components/App.vue'
+import store from './includes/store'
+import router from './includes/router'
 
 // window.addEventListener("touchmove", function(e) {
 //     console.log(e)
@@ -11,7 +11,8 @@ import App from './components/App.vue'
 // }, false);
 
 new Vue({
+    router,
     store,
     el: '#app',
-    render: h => h(App)
-});
+    render: h => h('router-view')
+})

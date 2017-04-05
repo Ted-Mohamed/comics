@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <ChatView showInput></ChatView>
+        <ChatView :showInput="showInput"></ChatView>
         <ZoomableImage @swipe="onSwipe"
                        :src="currentURL"></ZoomableImage>
     </div>
@@ -11,6 +11,17 @@ import ZoomableImage from './ZoomableImage.vue'
 import ChatView from './ChatView.vue'
 export default {
     name: "App",
+
+    props: {
+        id: {
+            type: Number,
+            default: 0
+        },
+        showInput: {
+            type: Boolean,
+            default: false
+        }
+    },
 
     components: { ZoomableImage, ChatView },
 
@@ -25,6 +36,10 @@ export default {
             this.$store.dispatch(direction == 'left' ? 'nextPage' : 'previousPage')
         }
     },
+
+    mounted () {
+        this.$store.dispatch('goToPage', this.id)
+    }
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div ref="container" class="container">
         <ChatView :showInput="showInput"></ChatView>
         <transition :name="direction"
                     mode="out-in">
@@ -15,7 +15,6 @@ import ZoomableImage from './ZoomableImage.vue'
 import ChatView from './ChatView.vue'
 export default {
     name: "App",
-
     props: {
         page: {
             type: Number,
@@ -59,17 +58,16 @@ export default {
         const fromPage = parseInt(from.params.page)
         this.direction = toPage > fromPage ? 'left' : 'right'
         this.$store.dispatch('goToPage', toPage).then(() => { next() }).catch(() => { next(false) })
-    }
+    },
 }
 </script>
 
 <style lang="stylus">
 .container {
     width: 100vw;
-    height: calc(100% - 0px);
+    height: calc(100% + 0px);
     display: flex;
     flex-direction: column;
-    
 }
 
 .ZoomableImage {

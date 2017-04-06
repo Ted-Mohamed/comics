@@ -33,7 +33,7 @@ export default {
 
     computed: {
         currentURL() {
-            return `./assets/comics/${this.$store.getters.currentURL}`
+            return `./comics/${this.$store.getters.currentURL}`
         }
     },
 

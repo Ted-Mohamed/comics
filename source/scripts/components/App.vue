@@ -33,19 +33,9 @@ export default {
 
     methods: {
         onSwipe(direction) {
-            this.$store.dispatch(direction == 'left' ? 'nextPage' : 'previousPage')
+            this.$router.push(`/${this.id + (direction == 'left' ? 1 : -1)}${this.showInput ? '?input' : ''}`)
         }
     },
-
-    watch: {
-        id: function (newVal) {
-            this.$store.dispatch('goToPage', newVal)
-        }
-    },
-
-    mounted () {
-        this.$store.dispatch('goToPage', this.id)
-    }
 }
 </script>
 

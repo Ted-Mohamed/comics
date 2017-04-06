@@ -3,12 +3,9 @@ import Vue from 'vue'
 import store from './includes/store'
 import router from './includes/router'
 
-// window.addEventListener("touchmove", function(e) {
-//     console.log(e)
-//   if (!e.target.classList.contains('scrollable')) {
-//     e.preventDefault();
-//   }
-// }, false);
+router.beforeEach((to, from, next) => {
+    store.dispatch('goToPage', parseInt(to.params.id)).then(() => { next() }).catch(() => { next(false) })
+})
 
 new Vue({
     router,

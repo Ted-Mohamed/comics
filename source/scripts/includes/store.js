@@ -15,26 +15,20 @@ export default new Vuex.Store({
         },
     },
     mutations: {
-        goToPage(state, id) {
-            if(manifest[id]) {
-                state.currentPage = id
-                return manifest[state.currentPage]
+        goToPage(state, number) {
+            if (manifest[number]) {
+                state.currentPage = number
             }
         },
-        nextPage(state) {
-            if (manifest[state.currentPage + 1]) {
-                state.currentPage += 1
-            }
-        },
-        previousPage(state) {
-            if (manifest[state.currentPage - 1]) {
-                state.currentPage -= 1
-            }
-        }
     },
     actions: {
-        goToPage: ({commit}, id) => commit('goToPage', id),
-        nextPage: ({ commit }) => commit('nextPage'),
-        previousPage: ({ commit }) => commit('previousPage'),
+        goToPage: ({ state, commit }, number) => new Promise((resolve, reject) => {
+            if (manifest[number]) {
+                commit('goToPage', number)
+                resolve()
+            } else {
+                reject()
+            }
+        })
     },
 })

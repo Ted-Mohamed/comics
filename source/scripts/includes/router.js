@@ -3,35 +3,18 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-
-
 import App from '../components/App.vue'
 
 export default new VueRouter({
     routes: [
-        {
-            path: '/',
-            component: App,
-        },
-        {
-            path: '/chat',
-            component: App,
-            props: { showInput: true}
-        },
-        {
-            path: '/chat/:id',
-            component: App,
-            props: (route) => ({
-                showInput: true,
-                id: parseInt(route.params.id)
-            })
-        },
+        { path: '/', redirect: '/0' },
         {
             path: '/:id',
             component: App,
             props: (route) => ({
+                showInput: route.query['input'] !== undefined,
                 id: parseInt(route.params.id)
-            })
+            }),
         }
-    ]
+    ],
 })

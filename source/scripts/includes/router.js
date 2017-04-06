@@ -9,11 +9,11 @@ export default new VueRouter({
     routes: [
         { path: '/', redirect: '/0' },
         {
-            path: '/:id',
+            path: '/:page',
             component: App,
             props: (route) => ({
                 showInput: route.query['input'] !== undefined,
-                id: parseInt(route.params.id)
+                page: parseInt(route.params.page)
             }),
         }
     ],

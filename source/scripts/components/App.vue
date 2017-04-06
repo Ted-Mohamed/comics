@@ -1,8 +1,12 @@
 <template>
     <div class="container">
         <ChatView :showInput="showInput"></ChatView>
-        <ZoomableImage @swipe="onSwipe"
-                       :src="currentURL"></ZoomableImage>
+        <transition :name="direction"
+                    mode="out-in">
+            <ZoomableImage :key="currentURL"
+                           @swipe="onSwipe"
+                           :src="currentURL"></ZoomableImage>
+        </transition>
     </div>
 </template>
 
@@ -13,7 +17,7 @@ export default {
     name: "App",
 
     props: {
-        id: {
+        page: {
             type: Number,
             default: 0
         },
@@ -22,7 +26,9 @@ export default {
             default: false
         }
     },
-
+    data: () => ({
+        direction: ''
+    }),
     components: { ZoomableImage, ChatView },
 
     computed: {
@@ -33,9 +39,27 @@ export default {
 
     methods: {
         onSwipe(direction) {
-            this.$router.push(`/${this.id + (direction == 'left' ? 1 : -1)}${this.showInput ? '?input' : ''}`)
-        }
+            this.$router.push(this.path(this.page + (direction == 'left' ? 1 : -1)))
+        },
+        path(page) {
+            return `/${page}${this.showInput ? '?input' : ''}`
+        } 
     },
+
+    beforeRouteEnter(to, from, next) {
+        next(vm => {
+            vm.$store.dispatch('goToPage', vm.page).catch(() => {
+                vm.$router.push(vm.path(0))
+            })
+        })
+    },
+
+    beforeRouteUpdate(to, from, next) {
+        const toPage = parseInt(to.params.page)
+        const fromPage = parseInt(from.params.page)
+        this.direction = toPage > fromPage ? 'left' : 'right'
+        this.$store.dispatch('goToPage', toPage).then(() => { next() }).catch(() => { next(false) })
+    }
 }
 </script>
 
@@ -44,10 +68,27 @@ export default {
     width: 100vw;
     height: calc(100% - 0px);
     display: flex;
-    flex-direction: column
+    flex-direction: column;
+    
 }
 
 .ZoomableImage {
     flex: 1;
+}
+
+.left-enter-active, .left-leave-active,
+.right-enter-active, .right-leave-active {
+  transition: transform .2s cubic-bezier(.45,0,.21,1), opacity .2s cubic-bezier(.45,0,.21,1);
+}
+.left-enter, .left-leave-to,
+.right-enter, .right-leave-to {
+  opacity: 0;
+}
+
+.left-enter, .left-leave-to {
+  transform: translateX(-30%)
+}
+.right-enter, .right-leave-to {
+  transform: translateX(30%)
 }
 </style>

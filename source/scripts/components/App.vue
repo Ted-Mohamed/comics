@@ -1,5 +1,6 @@
 <template>
-    <div ref="container" class="container">
+    <div ref="container"
+         class="container">
         <ChatView :showInput="showInput"></ChatView>
         <transition :name="direction"
                     mode="out-in">
@@ -42,7 +43,7 @@ export default {
         },
         path(page) {
             return `/${page}${this.showInput ? '?input' : ''}`
-        } 
+        }
     },
 
     beforeRouteEnter(to, from, next) {

@@ -46,7 +46,7 @@ export default {
     },
 
     mounted() {
-        messagesDB.limitToLast(20).on('value', snapshot => {
+        messagesDB.limitToLast(5).on('value', snapshot => {
             let messages = []
             snapshot.forEach((message) => {
                 messages.push(message.val())

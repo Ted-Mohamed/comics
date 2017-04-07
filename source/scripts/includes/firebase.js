@@ -1,4 +1,5 @@
-import Firebase from 'firebase'
+import Firebase from 'firebase/app'
+import 'firebase/database'
 
 export const app = Firebase.initializeApp({
     apiKey: FIREBASE_API_KEY,

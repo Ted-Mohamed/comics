@@ -89,6 +89,7 @@ gulp.task('scripts', function () {
         output: {
           filename: '[name].js',
         },
+        devtool: 'source-map',
         resolve: {
           extensions: ['.js', '.vue', '.json'],
           alias: {}
@@ -147,7 +148,8 @@ gulp.task('scripts', function () {
           //     keep_fnames: true
           //   },
           //   compress: {
-          //     screw_ie8: true
+          //     screw_ie8: true,
+          //     warnings: false
           //   },
           //   comments: false
           // })

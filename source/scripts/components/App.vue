@@ -1,7 +1,11 @@
 <template>
     <div ref="container"
          class="container">
-        <ChatView :showInput="showInput"></ChatView>
+        <transition name="fade">
+            <Confetti v-if="ShowConfetti"></Confetti>
+        </transition>
+        <ChatView @newmessage="onNewMessage"
+                  :showInput="showInput"></ChatView>
         <transition :name="direction"
                     mode="out-in">
             <ZoomableImage :key="currentURL"
@@ -14,6 +18,7 @@
 <script>
 import ZoomableImage from './ZoomableImage.vue'
 import ChatView from './ChatView.vue'
+import Confetti from './Confetti.vue'
 export default {
     name: "App",
     props: {
@@ -27,9 +32,10 @@ export default {
         }
     },
     data: () => ({
-        direction: ''
+        direction: '',
+        ShowConfetti: false
     }),
-    components: { ZoomableImage, ChatView },
+    components: { ZoomableImage, ChatView, Confetti },
 
     computed: {
         currentURL() {
@@ -38,6 +44,12 @@ export default {
     },
 
     methods: {
+        onNewMessage(message) {
+            if (/#aniv13/i.test(message)) {
+                this.ShowConfetti = true
+                setTimeout(() => { this.ShowConfetti = false }, 5000)
+            }
+        },
         onSwipe(direction) {
             this.$router.push(this.path(this.page + (direction == 'left' ? 1 : -1)))
         },
@@ -76,10 +88,12 @@ export default {
 }
 
 .left-enter-active, .left-leave-active,
+.fade-enter-active, .fade-leave-active,
 .right-enter-active, .right-leave-active {
   transition: transform .2s cubic-bezier(.45,0,.21,1), opacity .2s cubic-bezier(.45,0,.21,1);
 }
 .left-enter, .left-leave-to,
+.fade-enter, .fade-leave-to,
 .right-enter, .right-leave-to {
   opacity: 0;
 }

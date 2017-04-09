@@ -52,6 +52,7 @@ export default {
                 messages.push(message.val())
             })
             this.lastMessage = messages.pop()
+            this.$emit('newmessage', this.lastMessage)
             this.messages = messages
         })
     }

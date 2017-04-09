@@ -9,10 +9,12 @@
     flex: 1;
 }
 .left-enter-active, .left-leave-active,
+.fade-enter-active, .fade-leave-active,
 .right-enter-active, .right-leave-active {
   transition: transform .2s cubic-bezier(.45,0,.21,1), opacity .2s cubic-bezier(.45,0,.21,1);
 }
 .left-enter, .left-leave-to,
+.fade-enter, .fade-leave-to,
 .right-enter, .right-leave-to {
   opacity: 0;
 }
@@ -104,4 +106,14 @@ input.message {
         padding: .5rem;
         display: block;
 }
+}
+
+.Confetti {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0; 
+    right: 0;
+    z-index: 1000;
+    background: #fff
 }
